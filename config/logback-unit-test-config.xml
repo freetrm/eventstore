@@ -1,0 +1,75 @@
+<!-- The logback file used during the running of maker/sbt's own unit tests
+     Quietens the logging somewhat-->
+
+<configuration debug="false" >
+  <logger name="state.change.logger" level="OFF"/> 
+  <logger name="kafka.producer.async.DefaultEventHandler" level="OFF"/>
+
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>test-output.log</file>
+    <append>true</append>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level - %msg%n</pattern>
+      <immediateFlush>true</immediateFlush>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+        
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <!-- 
+          Add %logger to the log pattern to find the name of any 3rd party loggers
+          you want to exclude 
+      -->
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level - %msg%n</pattern>
+      <immediateFlush>true</immediateFlush>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="FILE" />
+  </root>
+
+  <logger name="slick.backend.DatabaseComponent.action"   level="${log.action:-debug}" />
+  <logger name="slick.backend.DatabaseComponent.stream"   level="${log.stream:-info}" />
+  <logger name="slick.compiler"                           level="${log.qcomp:-info}" />
+  <logger name="slick.compiler.QueryCompiler"             level="${log.qcomp.phases:-inherited}" />
+  <logger name="slick.compiler.QueryCompilerBenchmark"    level="${log.qcomp.bench:-inherited}" />
+  <logger name="slick.compiler.Inline"                    level="${log.qcomp.inline:-inherited}" />
+  <logger name="slick.compiler.AssignUniqueSymbols"       level="${log.qcomp.assignUniqueSymbols:-inherited}" />
+  <logger name="slick.compiler.InferTypes"                level="${log.qcomp.inferTypes:-inherited}" />
+  <logger name="slick.compiler.ExpandTables"              level="${log.qcomp.expandTables:-inherited}" />
+  <logger name="slick.compiler.CreateResultSetMapping"    level="${log.qcomp.createResultSetMapping:-inherited}" />
+  <logger name="slick.compiler.EmulateOuterJoins"         level="${log.qcomp.emulateOuterJoins:-inherited}" />
+  <logger name="slick.compiler.ForceOuterBinds"           level="${log.qcomp.forceOuterBinds:-inherited}" />
+  <logger name="slick.compiler.ExpandSums"                level="${log.qcomp.expandSums:-inherited}" />
+  <logger name="slick.compiler.ExpandRecords"             level="${log.qcomp.expandRecords:-inherited}" />
+  <logger name="slick.compiler.ExpandConditionals"        level="${log.qcomp.expandConditionals:-inherited}" />
+  <logger name="slick.compiler.FlattenProjections"        level="${log.qcomp.flattenProjections:-inherited}" />
+  <logger name="slick.compiler.RelabelUnions"             level="${log.qcomp.relabelUnions:-inherited}" />
+  <logger name="slick.compiler.PruneFields"               level="${log.qcomp.pruneFields:-inherited}" />
+  <logger name="slick.compiler.ResolveZipJoins"           level="${log.qcomp.resolveZipJoins:-inherited}" />
+  <logger name="slick.compiler.ConvertToComprehensions"   level="${log.qcomp.convertToComprehensions:-inherited}" />
+  <logger name="slick.compiler.FuseComprehensions"        level="${log.qcomp.fuseComprehensions:-inherited}" />
+  <logger name="slick.compiler.FixRowNumberOrdering"      level="${log.qcomp.fixRowNumberOrdering:-inherited}" />
+  <logger name="slick.compiler.HoistClientOps"            level="${log.qcomp.hoistClientOps:-inherited}" />
+  <logger name="slick.compiler.RewriteBooleans"           level="${log.qcomp.rewriteBooleans:-info}" />
+  <logger name="slick.compiler.SpecializeParameters"      level="${log.qcomp.specializeParameters:-inherited}" />
+  <logger name="slick.compiler.CodeGen"                   level="${log.qcomp.codeGen:-inherited}" />
+  <logger name="slick.compiler.InsertCompiler"            level="${log.qcomp.insertCompiler:-inherited}" />
+  <logger name="slick.jdbc.JdbcBackend.statement"         level="${log.jdbc.statement:-info}" />
+  <logger name="slick.jdbc.JdbcBackend.benchmark"         level="${log.jdbc.bench:-info}" />
+  <logger name="slick.jdbc.StatementInvoker.result"       level="${log.jdbc.result:-debug}" />
+  <logger name="slick.jdbcJdbcModelBuilder"               level="${log.createModel:-info}" />
+  <logger name="slick.ast.Node"                          level="${log.qcomp.assignTypes:-inherited}" />
+  <logger name="slick.memory.HeapBackend"                level="${log.heap:-inherited}" />
+  <logger name="slick.memory.QueryInterpreter"            level="${log.interpreter:-inherited}" />
+  <logger name="slick.relational.ResultConverterCompiler" level="${log.resultConverter:-inherited}" />
+  <logger name="slick.util.AsyncExecutor"                level="${log.asyncExecutor:-inherited}" />
+</configuration>
