@@ -1,0 +1,18 @@
+#idea stuff
+.idea_modules/
+.idea/
+*.iml
+
+target/
+test-output/
+*/lib_managed
+*-classpath.sh
+**/logback-vim.xml
+*/lib_src_managed/
+tags
+*.pid
+
+*.log
+logs
+
+application.conf
