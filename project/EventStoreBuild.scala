@@ -2,23 +2,29 @@ import sbt._
 import sbt.Keys._
 
 import scala.util.Properties
+import SonatypeSupport._
 
 object EventStoreBuild extends Build {
   Properties.setProp("logback.configurationFile", "config/logback-unit-tests.xml")
   val buildOrganisation = "org.freetrm"
+  val project = "eventstore"
   val buildVersion = "0.1-SNAPSHOT"
   val buildScalaVersion = "2.11.8"
+  val license = Apache2
 
   val akkaV = "2.4.4"
   val sprayV = "1.3.3"
 
-  lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq(
-    updateOptions := updateOptions.value.withCachedResolution(cachedResoluton = true),
-    organization := buildOrganisation,
-    version := buildVersion,
-    scalaVersion := buildScalaVersion,
-    scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings")
-  )
+  lazy val buildSettings = Defaults.coreDefaultSettings ++
+    sonatype(buildOrganisation, project, license) ++
+    Seq(
+      updateOptions := updateOptions.value.withCachedResolution(cachedResoluton = true),
+      organization := buildOrganisation,
+      version := buildVersion,
+      name := project,
+      scalaVersion := buildScalaVersion,
+      scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings")
+    )
 
   lazy val base = module("base", withResources = true).settings(
     libraryDependencies ++=
@@ -98,38 +104,4 @@ object EventStoreBuild extends Build {
   implicit class RichBoolean(val b: Boolean) extends AnyVal {
     final def option[A](a: => A): Option[A] = if (b) Some(a) else None
   }
-  
-  publishMavenStyle := true
-  
-  publishArtifact in Test := false
-  
-  pomIncludeRepository := { _ => false }
-  
-  publishTo <<= version { v: String =>
-    val nexus = "https://oss.sonatype.org/"
-    if (v.contains("SNAP")) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else                    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  }
-  
-  credentials += Credentials(
-    "Sonatype Nexus Repository Manager", "oss.sonatype.org",
-    sys.env.getOrElse("SONATYPE_USERNAME", ""),
-    sys.env.getOrElse("SONATYPE_PASSWORD", "")
-  )
-  
-  pomExtra := <url>https://github.com/og3b</url>
-    <licenses>
-      <license>
-        <name>BSD-style</name>
-        <url>http://www.opensource.org/licenses/bsd-license.php</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <developers>
-      <developer>
-        <id>og3b</id>
-        <name>og3b</name>
-      </developer>
-    </developers>
-  
 }
