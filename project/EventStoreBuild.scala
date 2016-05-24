@@ -2,25 +2,30 @@ import sbt._
 import sbt.Keys._
 
 import scala.util.Properties
+import SonatypeSupport._
 
 object EventStoreBuild extends Build {
   Properties.setProp("logback.configurationFile", "config/logback-unit-tests.xml")
   val buildOrganisation = "org.freetrm"
-  val buildVersion = "0.1-SNAPSHOT"
+  val projectName = "eventstore"
+  val buildVersion = "0.1.6"
   val buildScalaVersion = "2.11.8"
+  val license = Apache2
 
   val akkaV = "2.4.4"
   val sprayV = "1.3.3"
 
-  lazy val buildSettings = Defaults.coreDefaultSettings ++ Seq(
-    updateOptions := updateOptions.value.withCachedResolution(cachedResoluton = true),
-    organization := buildOrganisation,
-    version := buildVersion,
-    scalaVersion := buildScalaVersion,
-    scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings")
-  )
+  lazy val buildSettings = Defaults.coreDefaultSettings ++
+    Seq(
+      updateOptions := updateOptions.value.withCachedResolution(cachedResoluton = true),
+      organization := buildOrganisation,
+      version := buildVersion,
+      scalaVersion := buildScalaVersion,
+      scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings")
+    )
 
-  lazy val base = module("base", withResources = true).settings(
+  lazy val base = module("base", withResources = true)
+    .settings(
     libraryDependencies ++=
       "ch.qos.logback" % "logback-classic" % "1.1.7" +: 
       "log4j" % "log4j" % "1.2.17" +: 
@@ -53,8 +58,8 @@ object EventStoreBuild extends Build {
       resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven"
   )
 
-
-  lazy val db = module("db", withResources = true).settings(
+  lazy val db = module("db", withResources = true)
+    .settings(
     libraryDependencies ++=
       "commons-logging" % "commons-logging" % "1.2" +:
         DepSeq(
@@ -67,13 +72,15 @@ object EventStoreBuild extends Build {
     base % "compile->compile;test->test"
   )
 
-  def module(name: String, withResources: Boolean = false): Project = {
+  def module(moduleName: String, withResources: Boolean = false): Project = {
     Project(
-      id = name,
-      base = file(name),
+      id = moduleName,
+      base = file(moduleName),
       settings = buildSettings
     )
+      .settings(sonatype(buildOrganisation, projectName, license))
       .settings(
+        name := s"eventstore-$moduleName",
         scalaSource in Compile := baseDirectory.value / "src",
         scalaSource in Test := baseDirectory.value / "tests",
         resourceDirectory in Test := baseDirectory.value / "test-resources"
@@ -98,38 +105,4 @@ object EventStoreBuild extends Build {
   implicit class RichBoolean(val b: Boolean) extends AnyVal {
     final def option[A](a: => A): Option[A] = if (b) Some(a) else None
   }
-  
-  publishMavenStyle := true
-  
-  publishArtifact in Test := false
-  
-  pomIncludeRepository := { _ => false }
-  
-  publishTo <<= version { v: String =>
-    val nexus = "https://oss.sonatype.org/"
-    if (v.contains("SNAP")) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else                    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  }
-  
-  credentials += Credentials(
-    "Sonatype Nexus Repository Manager", "oss.sonatype.org",
-    sys.env.getOrElse("SONATYPE_USERNAME", ""),
-    sys.env.getOrElse("SONATYPE_PASSWORD", "")
-  )
-  
-  pomExtra := <url>https://github.com/og3b</url>
-    <licenses>
-      <license>
-        <name>BSD-style</name>
-        <url>http://www.opensource.org/licenses/bsd-license.php</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <developers>
-      <developer>
-        <id>og3b</id>
-        <name>og3b</name>
-      </developer>
-    </developers>
-  
 }
